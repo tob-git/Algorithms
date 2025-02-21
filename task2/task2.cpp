@@ -104,8 +104,13 @@ int main() {
     vector<pair<int,int>> path;
 
     // Choose a starting position, e.g., top-left corner (0,0)
-    int row = 0;
-    int col = 0;
+    // Determine a "center" starting position.
+    int row = n / 2;
+    if (n % 2 == 0) {
+        // Shift one cell for even-size boards
+        row -= 1;
+    }
+    int col = row;
     // Mark the chosen start cell as visited and push it onto the path
     visited[row][col] = true;
     path.push_back({row, col});
