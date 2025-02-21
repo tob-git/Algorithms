@@ -1,0 +1,211 @@
+Detailed assumptions:
+-Chessboard Dimensions and Coloring
+The board is a standard, 2D n×n grid of cells (no irregular shapes or missing cells).
+For the classical 8×8 case, we assume a standard chessboard layout. For general n×n, the board remains a uniform square grid.
+Each cell can be identified by (row, col), with row, col in {0, 1, 2, …, n−1}.
+We assume that the color pattern (black/white arrangement) follows the usual alternating scheme and that a knight on a standard board always moves to a square of the opposite color.
+-Knight’s Movement
+The knight moves in an “L” shape: two steps in one direction (horizontal or vertical), and then one step perpendicular to that. Mathematically, from (r, c) it can move to: (r ± 2, c ± 1) or (r ± 1, c ± 2), as long as the resulting cell is within the board boundaries.
+A cell is considered visited only if the knight lands on it. Merely “jumping over” a cell does not count as visiting it.
+-Definition of a Closed (Re-entrant) Tour
+A tour is a sequence of moves in which the knight visits every cell exactly once.
+A tour is closed (or re-entrant) if, after visiting all n² cells, the knight’s final position is a legal knight’s move away from the initial position. In other words, the knight could jump back to the start in one move.
+For a closed tour to be possible, the start and end cells must be of the same color, which implies that n² (the total number of squares) is even. This further implies that n itself must be even for a re-entrant tour to exist.
+-Correctness vs. Heuristic
+The code is intended to attempt finding a closed tour using a heuristic. If it fails, that alone does not prove that no tour exists.
+In practice, if Warnsdorff’s rule fails, one can retry from different initial cells or employ a full backtracking approach (though that is more expensive) to confirm whether a closed tour exists.
+
+
+Problem description:
+We want to determine whether a chess knight can visit every cell of an 8×8 chessboard exactly once—such that the final position of the knight is a valid knight’s move away from its initial position. In other words, we are asked about the existence of a closed (re-entrant) knight’s tour on an 8×8 board. A “closed” tour means the knight could jump back to its starting square in a single move after having visited every cell exactly once.
+
+Extending this question to an n×n board (with n > 8), we want to know under which conditions such closed knight’s tours are possible. Specifically:
+
+Can a chess knight always visit all the cells of an n×n board exactly once and end on a cell that is one knight’s move away from the starting cell?
+If not for all n, then which values of n admit a closed knight’s tour, and which do not?
+Design and implement a greedy algorithm (based on Warnsdorff’s Rule or a similar heuristic) to find a tour (or determine that one does not exist), and measure how many moves the knight needs to complete the tour.
+Discuss or study the behavior of this algorithm and the problem constraints for different values of n.
+We also note that a cell is considered “visited” only if the knight lands on it. Simply passing over a cell during a jump does not count as a visit.
+
+
+
+
+Detailed solution including the pseudo-code, the code and the description of the steps of your solution:
+
+This solution follows **Warnsdorff's Rule** with optimizations to improve execution time and increase the likelihood of finding a **closed tour**. Below are three versions of the algorithm, each improving upon the previous.
+
+---
+
+## **1. First Version: Pure Warnsdorff’s Algorithm**
+This version implements the basic Warnsdorff's heuristic:
+
+### **Steps**
+1. **Initialize the board:** Mark all cells as unvisited.
+2. **Choose a starting position:** The knight starts at `(0,0)`.
+3. **Generate possible moves:** The knight can move in 8 possible directions.
+4. **Sort the moves by the number of onward moves:** Pick the move that has the least number of future moves.
+5. **Recursive exploration:** Move to the chosen cell and repeat.
+6. **Backtracking:** If a dead end is reached, undo the last move and try another.
+7. **Completion check:** If all cells are visited, return success.
+
+### **Pseudocode**
+```plaintext
+function warnsdorffTour(r, c, moveCount, n, visited, path):
+    if moveCount == n*n:
+        return True  // Tour completed
+
+    candidates = []
+    for each move in knightMoves:
+        new_r, new_c = r + move.row, c + move.col
+        if isValid(new_r, new_c, n, visited):
+            candidates.append((new_r, new_c, countOnwardMoves(new_r, new_c, n, visited)))
+
+    sort candidates by countOnwardMoves in ascending order
+
+    for each candidate (next_r, next_c) in candidates:
+        mark visited[next_r][next_c] = True
+        path.append((next_r, next_c))
+
+        if warnsdorffTour(next_r, next_c, moveCount+1, n, visited, path):
+            return True
+
+        mark visited[next_r][next_c] = False  // Backtrack
+        path.pop()
+
+    return False
+```
+
+---
+
+## **2. Second Version: Optimizing for Re-Entry in Closed Tours**
+One issue with the first version is that if the starting position is at a **corner cell**, after the first move, only **one adjacent cell** remains that can lead back to the start, making a **closed tour** almost impossible.
+
+### **Improvements**
+- **Avoid starting in a corner**: We start in the center or as close as possible.
+- **Re-entry optimization**: Ensure that there are multiple paths to return to the start.
+
+### **Pseudocode**
+```plaintext
+function warnsdorffTour(r, c, moveCount, n, visited, path):
+    if moveCount == n*n:
+        if canJumpBackToStart(r, c, path[0]):
+            return True
+        else:
+            return False
+
+    candidates = []
+    for each move in knightMoves:
+        new_r, new_c = r + move.row, c + move.col
+        if isValid(new_r, new_c, n, visited):
+            candidates.append((new_r, new_c, countOnwardMoves(new_r, new_c, n, visited)))
+
+    sort candidates by countOnwardMoves in ascending order
+
+    for each candidate (next_r, next_c) in candidates:
+        mark visited[next_r][next_c] = True
+        path.append((next_r, next_c))
+
+        if warnsdorffTour(next_r, next_c, moveCount+1, n, visited, path):
+            return True
+
+        mark visited[next_r][next_c] = False  // Backtrack
+        path.pop()
+
+    return False
+```
+---
+## **3. Third Version: Fine-Tuning the Heuristic**
+Now, we further **fine-tune the heuristic** by **adding an additional sorting criterion**:
+1. **Sort first by fewest onward moves** (as in pure Warnsdorff).
+2. **Break ties by preferring moves that are farther from the starting position**, which helps in leaving the **adjacent cells of the start** for later, making re-entry easier.
+
+### **Pseudocode**
+```plaintext
+function warnsdorffTour(r, c, moveCount, n, visited, path):
+    if moveCount == n*n:
+        if canJumpBackToStart(r, c, path[0]):
+            return True
+        else:
+            return False
+
+    candidates = []
+    for each move in knightMoves:
+        new_r, new_c = r + move.row, c + move.col
+        if isValid(new_r, new_c, n, visited):
+            onwardMoves = countOnwardMoves(new_r, new_c, n, visited)
+            distanceFromStart = squaredDistance(new_r, new_c, path[0])
+            candidates.append((new_r, new_c, onwardMoves, distanceFromStart))
+
+    sort candidates by (onwardMoves ascending, distanceFromStart descending)
+
+    for each candidate (next_r, next_c) in candidates:
+        mark visited[next_r][next_c] = True
+        path.append((next_r, next_c))
+
+        if warnsdorffTour(next_r, next_c, moveCount+1, n, visited, path):
+            return True
+
+        mark visited[next_r][next_c] = False  // Backtrack
+        path.pop()
+
+    return False
+```
+
+---
+## **Final Explanation of the Code**
+The **final C++ code** implements the last optimization where:
+1. It starts from the **center of the board** rather than a corner.
+2. It **sorts moves by onward degree** (Warnsdorff’s Rule).
+3. If multiple moves have the same onward degree, it **prioritizes the move farthest from the start**.
+4. It ensures that **the final move can reach the start** (closed tour).
+
+### **Key Functions**
+- `isValid(r, c, n, visited)`: Checks if a move is within bounds and not visited.
+- `countOnwardMoves(r, c, n, visited)`: Counts available onward moves for a given position.
+- `warnsdorffTour()`: Recursively applies Warnsdorff’s heuristic with backtracking.
+- `main()`: Initializes the board, chooses a smart starting position, and executes the tour.
+
+
+
+
+Complexity Analysis
+
+High-Level Structure: The function warnsdorffTour is essentially a depth-first backtracking method augmented with Warnsdorff’s heuristic. From each position on the board, it:
+Collects valid knight moves (up to 8).
+Sorts them based on the number of onward moves and a tie-breaking distance measure.
+Recursively explores each move. If it fails to complete the tour, it backtracks.
+Worst-Case Exponential Search: In the worst case, a backtracking approach to the knight’s tour can explore nearly all sequences of board positions, leading to a branching factor of up to 8 at each of the n^2 steps. This suggests a worst-case complexity on the order of 8^(n^2). Although many moves are invalid or pruned, the exponential bound remains the upper limit.
+Effect of Warnsdorff’s Heuristic: Warnsdorff’s rule tries to minimize backtracking by choosing moves with the fewest onward options first. In practice, this often leads to a valid tour quickly. However, even though it performs very well in most cases, it does not strictly guarantee a polynomial-time solution.
+Sorting and Onward-Move Count Overhead: At each step, sorting up to 8 candidates is effectively constant time, and computing onward moves for each candidate also checks at most 8 possible moves. These overheads add a constant factor at each step and do not change the overall exponential nature of the worst-case scenario.
+Overall Summary: Worst-case complexity: Exponential in n^2, roughly 8^(n^2). Practical complexity: Warnsdorff’s heuristic often finds a tour without exhaustive backtracking, drastically reducing real-world runtime compared to the naive bound.
+
+
+
+Comparison of the Warnsdorff’s Heuristic Approach vs. a Standard Backtracking Approach
+
+Description of the Techniques:
+Warnsdorff’s Heuristic: Warnsdorff’s rule selects the next knight move by looking at the number of onward moves from each candidate position and always choosing the position with the fewest onward moves first. This approach attempts to limit backtracking by avoiding squares that are likely to lead to dead ends.
+Standard Backtracking: A conventional backtracking algorithm for the knight’s tour tries every valid next move in some fixed or arbitrary order. When a move leads to a dead end, the algorithm backtracks to a previous position and tries a different move.
+Search Complexity:
+In the worst case, both methods exhibit exponential time complexity. A knight can have up to 8 moves at each step, and there are n×n positions to fill, so the branching can be on the order of 8^(n^2) in the absolute worst scenario.
+However, Warnsdorff’s heuristic often succeeds in quickly finding a path with minimal backtracking for many board sizes, acting almost like a near-linear or polynomial-time method in practice, although this is not strictly guaranteed.
+Practical Performance:
+Warnsdorff’s Heuristic:
+Typically finds a valid knight’s tour for many board sizes without exhaustive search.
+The sorting overhead per step (up to 8 candidate moves) is negligible compared to the potential exponential blow-up of the backtracking search tree.
+Often yields a solution very quickly for standard chessboards (8×8) and larger boards.
+Standard Backtracking:
+Lacks any strong mechanism to guide the choice of moves, so it may go down many fruitless paths.
+May spend significant time exploring partial solutions that lead to dead ends, backtracking repeatedly.
+Often requires extra heuristics, pruning rules, or random restarts to make practical progress for larger boards.
+Ease of Implementation:
+Warnsdorff’s Heuristic:
+Slightly more complex to implement because each move selection requires counting onward moves, then sorting.
+However, once coded, it is straightforward to maintain and typically delivers quick tours for many board sizes.
+Standard Backtracking:
+Conceptually simpler because it just tries all possible moves in a straightforward manner.
+Without additional heuristics, can be very slow and likely will not find a solution in reasonable time for larger boards.
+Summary:
+Both methods have the same worst-case exponential bound, but Warnsdorff’s heuristic is far more effective in practice.
+Standard backtracking can be easier to code at first, but lacks strong guidance, leading to significantly more backtracking.
+For most practical purposes, Warnsdorff’s algorithm is preferred because it often arrives at a solution quickly, especially on typical or large board sizes.
