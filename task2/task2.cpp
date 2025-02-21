@@ -68,10 +68,22 @@ bool warnsdorffTour(int r, int c, int moveCount,
     int onwardA = countOnwardMoves(a.first, a.second, n, visited);
     int onwardB = countOnwardMoves(b.first, b.second, n, visited);
 
-    return onwardA < onwardB;
+    // 1) Primary criterion: fewer onward moves comes first
+    if (onwardA != onwardB) {
+        return onwardA < onwardB;
+    }
 
+    // 2) Tie-breaker: the one that's farther from (0,0) comes first.
+    //    We'll compare squared distances to avoid unnecessary sqrt calls.
+    long long distA = static_cast<long long>(a.first) * a.first
+                    + static_cast<long long>(a.second) * a.second;
+    long long distB = static_cast<long long>(b.first) * b.first
+                    + static_cast<long long>(b.second) * b.second;
+
+    // If A is farther than B, then A should come first => return true
+    // (since "true" means "a < b" in the sense that 'a' precedes 'b' in the sorted output).
+    return distA > distB;
 });
-
     // Try each candidate move in ascending order of onward-degree
     for (auto &cand : candidates) {
         int rr = cand.first;
