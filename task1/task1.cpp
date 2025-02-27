@@ -64,9 +64,9 @@ void tileBoard(vector<vector<char>>& board, int n, int x, int y, string location
         board[x + n / 2 - 1][y + n / 2] = 'G';
         board[x + n / 2][y + n / 2 - 1] = 'G';
         board[x + n / 2 - 1][y + n / 2 - 1] = 'G';
-        cout<<"tile placed at ("<<x+n/2-1<<","<<y+n/2<<")"<<" with color Green"<<endl;
-        cout<<"tile placed at ("<<x+n/2<<","<<y+n/2-1<<")"<<" with color Green"<<endl;
-        cout<<"tile placed at ("<<x+n/2-1<<","<<y+n/2-1<<")"<<" with color Green"<<endl;
+        cout<<"tile placed at row "<<x+n/2-1<<", column "<<y+n/2<<" with color Green"<<endl;
+        cout<<"tile placed at row "<<x+n/2<<", column "<<y+n/2-1<<" with color Green"<<endl;
+        cout<<"tile placed at row "<<x+n/2-1<<", column "<<y+n/2-1<<" with color Green"<<endl;
         
     }
 
