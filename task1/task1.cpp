@@ -90,18 +90,18 @@ int main() {
 
     vector<vector<char>> board(size, vector<char>(size, 0));
 
-    int missing_x, missing_y;
+    int missing_row, missing_column;
     do {
         cout << "Enter the row number of the missing tile (0-based indexing): ";
-        cin >> missing_x;
+        cin >> missing_row;
         cout << "Enter the column number of the missing tile (0-based indexing): ";
-        cin >> missing_y;
-        if (missing_x < 0 || missing_x >= size || missing_y < 0 || missing_y >= size) {
+        cin >> missing_column;
+        if (missing_row < 0 || missing_row >= size || missing_column < 0 || missing_column >= size) {
             cout << "Invalid coordinates. Please enter values between 0 and " << size - 1 << "." << endl;
         }
-    } while (missing_x < 0 || missing_x >= size || missing_y < 0 || missing_y >= size);
+    } while (missing_row < 0 || missing_row >= size || missing_column < 0 || missing_column >= size);
 
-    board[missing_x][missing_y] = 'x';
+    board[missing_row][missing_column] = 'x';
 
     tileBoard(board, size, 0, 0, "UR");
 
