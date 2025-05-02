@@ -3,19 +3,19 @@
 #include <cmath>
 using namespace std;
 
-void tileBoard(vector<vector<char>>& board, int n, int x, int y, string location) {
-    if (n == 2) {
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+void tileBoard(vector<vector<char>>& board, int size, int x, int y, string location) {
+    if (size == 2) {
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
                 if (board[x + i][y + j] == 0) {
                     if (location == "UR" || location == "DL") {
                         board[x + i][y + j] = 'R';
-                        cout<<"tile placed at row "<<x+i<<", column "<<y+j<<" with color Red"<<endl;
+                        cout<<"tile at row "<<x+i<<", column "<<y+j<<" with color Red"<<endl;
                         
                     }
                     else if (location == "DR" || location == "UL") {
                         board[x + i][y + j] = 'B';
-                        cout<<"tile placed at row "<<x+i<<", column "<<y+j<<" with color Blue"<<endl;
+                        cout<<"tile at row "<<x+i<<", column "<<y+j<<" with color Blue"<<endl;
                         
                     }
                 }
@@ -25,55 +25,56 @@ void tileBoard(vector<vector<char>>& board, int n, int x, int y, string location
     }
 
     int r = 0, c = 0;
-    for (int i = x; i < x + n; i++) {
-        for (int j = y; j < y + n; j++) {
+    for (int i = x; i < x + size; i++) {
+        for (int j = y; j < y + size; j++) {
             if (board[i][j] != 0) {
                 r = i;
                 c = j;
+                break;
             }
         }
     }
 
-    if (r < x + n / 2 && c < y + n / 2) {
-        board[x + n / 2][y + n / 2 - 1] = 'G';
-        board[x + n / 2][y + n / 2] = 'G';
-        board[x + n / 2 - 1][y + n / 2] = 'G';
-        cout<<"tile placed at row "<<x+n/2<<", column "<<y+n/2-1<<" with color Green"<<endl;
-        cout<<"tile placed at row "<<x+n/2<<", column "<<y+n/2<<" with color Green"<<endl;
-        cout<<"tile placed at row "<<x+n/2-1<<", column "<<y+n/2<<" with color Green"<<endl;
-    }
-    else if (r >= x + n / 2 && c < y + n / 2) {
-        board[x + n / 2 - 1][y + n / 2] = 'G';
-        board[x + n / 2][y + n / 2] = 'G';
-        board[x + n / 2 - 1][y + n / 2 - 1] = 'G';
-        cout<<"tile placed at row "<<x+n/2-1<<", column "<<y+n/2<<" with color Green"<<endl;
-        cout<<"tile placed at row "<<x+n/2<<", column "<<y+n/2<<" with color Green"<<endl;
-        cout<<"tile placed at row "<<x+n/2-1<<", column "<<y+n/2-1<<" with color Green"<<endl;
+    if (r < x + size / 2 && c < y + size / 2) {
+        board[x + size / 2][y + size / 2 - 1] = 'G';
+        board[x + size / 2][y + size / 2] = 'G';
+        board[x + size / 2 - 1][y + size / 2] = 'G';
+        cout<<"tile at row "<<x+size/2<<", column "<<y+size/2-1<<" with color Green"<<endl;
+        cout<<"tile at row "<<x+size/2<<", column "<<y+size/2<<" with color Green"<<endl;
+        cout<<"tile at row "<<x+size/2-1<<", column "<<y+size/2<<" with color Green"<<endl;
+        }
+        else if (r >= x + size / 2 && c < y + size / 2) {
+        board[x + size / 2 - 1][y + size / 2] = 'G';
+        board[x + size / 2][y + size / 2] = 'G';
+        board[x + size / 2 - 1][y + size / 2 - 1] = 'G';
+        cout<<"tile at row "<<x+size/2-1<<", column "<<y+size/2<<" with color Green"<<endl;
+        cout<<"tile at row "<<x+size/2<<", column "<<y+size/2<<" with color Green"<<endl;
+        cout<<"tile at row "<<x+size/2-1<<", column "<<y+size/2-1<<" with color Green"<<endl;
         
-    }
-    else if (r < x + n / 2 && c >= y + n / 2) {
-        board[x + n / 2][y + n / 2 - 1] = 'G';
-        board[x + n / 2][y + n / 2] = 'G';
-        board[x + n / 2 - 1][y + n / 2 - 1] = 'G';
-        cout<<"tile placed at row "<<x+n/2<<", column "<<y+n/2-1<<" with color Green"<<endl;
-        cout<<"tile placed at row "<<x+n/2<<", column "<<y+n/2<<" with color Green"<<endl;
-        cout<<"tile placed at row "<<x+n/2-1<<", column "<<y+n/2-1<<" with color Green"<<endl;
+        }
+        else if (r < x + size / 2 && c >= y + size / 2) {
+        board[x + size / 2][y + size / 2 - 1] = 'G';
+        board[x + size / 2][y + size / 2] = 'G';
+        board[x + size / 2 - 1][y + size / 2 - 1] = 'G';
+        cout<<"tile at row "<<x+size/2<<", column "<<y+size/2-1<<" with color Green"<<endl;
+        cout<<"tile at row "<<x+size/2<<", column "<<y+size/2<<" with color Green"<<endl;
+        cout<<"tile at row "<<x+size/2-1<<", column "<<y+size/2-1<<" with color Green"<<endl;
         
-    }
-    else if (r >= x + n / 2 && c >= y + n / 2) {
-        board[x + n / 2 - 1][y + n / 2] = 'G';
-        board[x + n / 2][y + n / 2 - 1] = 'G';
-        board[x + n / 2 - 1][y + n / 2 - 1] = 'G';
-        cout<<"tile placed at row "<<x+n/2-1<<", column "<<y+n/2<<" with color Green"<<endl;
-        cout<<"tile placed at row "<<x+n/2<<", column "<<y+n/2-1<<" with color Green"<<endl;
-        cout<<"tile placed at row "<<x+n/2-1<<", column "<<y+n/2-1<<" with color Green"<<endl;
+        }
+        else if (r >= x + size / 2 && c >= y + size / 2) {
+        board[x + size / 2 - 1][y + size / 2] = 'G';
+        board[x + size / 2][y + size / 2 - 1] = 'G';
+        board[x + size / 2 - 1][y + size / 2 - 1] = 'G';
+        cout<<"tile at row "<<x+size/2-1<<", column "<<y+size/2<<" with color Green"<<endl;
+        cout<<"tile at row "<<x+size/2<<", column "<<y+size/2-1<<" with color Green"<<endl;
+        cout<<"tile at row "<<x+size/2-1<<", column "<<y+size/2-1<<" with color Green"<<endl;
         
-    }
+        }
 
-    tileBoard(board, n / 2, x, y + n / 2, "DL");
-    tileBoard(board, n / 2, x, y, "DR");
-    tileBoard(board, n / 2, x + n / 2, y, "UR");
-    tileBoard(board, n / 2, x + n / 2, y + n / 2, "UL");
+        tileBoard(board, size / 2, x, y + size / 2, "DL");
+        tileBoard(board, size / 2, x, y, "DR");
+        tileBoard(board, size / 2, x + size / 2, y, "UR");
+        tileBoard(board, size / 2, x + size / 2, y + size / 2, "UL");
 }
 
 int main() {
